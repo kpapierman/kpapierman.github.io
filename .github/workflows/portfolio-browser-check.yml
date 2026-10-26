@@ -1,0 +1,41 @@
+name: Portfolio browser navigation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'styles.css'
+      - 'scripts/test_portfolio_browser.mjs'
+      - '.github/workflows/portfolio-browser-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Test local copy of portfolio in desktop and mobile Chromium
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/portfolio-http.log 2>&1 &
+          sleep 2
+          node scripts/test_portfolio_browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portfolio-browser-screenshots
+          path: |
+            portfolio-projects-desktop.png
+            portfolio-preview-mobile.png
+          if-no-files-found: ignore
