@@ -54,6 +54,9 @@ with ZipFile(source) as z:
                for d in root.xpath("./dashboards/dashboard"))
     assert not charts[0].xpath(".//encodings/color")
     modified = ET.tostring(root, encoding="utf-8", xml_declaration=True, pretty_print=False)
+    # Correct an original spelling typo in titles and related references only.
+    # This does not change calculations, filters, charts, or layout.
+    modified = modified.replace(b"Opiod", b"Opioid")
 
     with ZipFile(target, "w") as out:
         for item in z.infolist():
