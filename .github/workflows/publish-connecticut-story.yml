@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - .github/workflows/publish-connecticut-story.yml
+      - scripts/clean_connecticut_story.py
 
 permissions:
   contents: write
